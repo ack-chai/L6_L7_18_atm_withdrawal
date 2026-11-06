@@ -1,16 +1,100 @@
-# L6_L7_18_atm_withdrawal — ATM Withdrawal
+# Lab 6: Code and Branch Coverage — ATM Withdrawal
 
-Lab 6: Code and Branch Coverage
+**Student:** ack-chai  
+**Upstream Repo:** [SETAPESU26/L6_L7_18_atm_withdrawal](https://github.com/SETAPESU26/L6_L7_18_atm_withdrawal)
+
+---
 
 ## About
 
-A small Python module that processes ATM withdrawals with daily limits and fees, checks PIN attempts and works out the note breakup.
+This lab explores the difference between **statement (line) coverage** and **branch coverage** using a small Python ATM withdrawal module (`atm_withdrawal.py`).
+
+The module simulates:
+- **`withdraw()`** — processes ATM withdrawals with daily limits and inter-bank fees
+- **`pin_check()`** — validates PIN entry and tracks failed attempts
+- **`note_breakup()`** — calculates the denomination breakdown (₹500, ₹200, ₹100) for a given amount
+
+---
 
 ## Files
 
 | File | Description |
 |------|-------------|
 | `atm_withdrawal.py` | The module under test |
-| `test_atm_withdrawal.py` | Starter test file |
+| `test_atm_withdrawal.py` | Starter test file (completed with all branch coverage tests) |
+| `CodeCoverageTest_atm_withdrawal.py` | Test cases achieving **100% statement coverage** |
+| `BranchCoverageTest_atm_withdrawal.py` | Test cases achieving **100% branch coverage** |
+| `code_coverage_screenshot.png` | Terminal output for code coverage run |
+| `branch_coverage_screenshot.png` | Terminal output for branch coverage run |
 
-Refer to the lab handout for instructions.
+---
+
+## Coverage Results
+
+### Statement Coverage — 100%
+
+```bash
+coverage run -m pytest CodeCoverageTest_atm_withdrawal.py && coverage report -m
+```
+
+```
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+atm_withdrawal.py                       34      0   100%
+------------------------------------------------------------------
+TOTAL                                   65      0   100%
+```
+
+![Code Coverage Screenshot](code_coverage_screenshot.png)
+
+---
+
+### Branch Coverage — 100% (22/22 branches)
+
+```bash
+coverage run --branch -m pytest BranchCoverageTest_atm_withdrawal.py && coverage report -m
+```
+
+```
+Name                                   Stmts   Miss Branch BrPart  Cover   Missing
+----------------------------------------------------------------------------------
+atm_withdrawal.py                         34      0     22      0   100%
+----------------------------------------------------------------------------------
+TOTAL                                     76      0     22      0   100%
+```
+
+![Branch Coverage Screenshot](branch_coverage_screenshot.png)
+
+---
+
+## Key Insight: Why Line Coverage ≠ Branch Coverage
+
+Even with 100% statement coverage, branch coverage exposed a gap:
+
+In `withdraw()`:
+```python
+if not own_bank:
+    fee = 20
+    if amount > 10000:   # ← this branch was only tested for amount > 10000
+        fee += 10
+```
+
+The statement coverage tests always used `amount > 10000` when `own_bank=False`, so line 15 (`fee += 10`) was executed. However, the **else path** (where `own_bank=False` but `amount <= 10000`) was never tested, which branch coverage caught.
+
+---
+
+## How to Run
+
+```bash
+# Clone
+git clone https://github.com/ack-chai/L6_L7_18_atm_withdrawal.git
+cd L6_L7_18_atm_withdrawal/"Lab 6"
+
+# Statement coverage
+coverage run -m pytest CodeCoverageTest_atm_withdrawal.py
+coverage report -m
+
+# Branch coverage
+coverage run --branch -m pytest BranchCoverageTest_atm_withdrawal.py
+coverage report -m
+```
