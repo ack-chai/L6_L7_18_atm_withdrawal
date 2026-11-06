@@ -1,12 +1,37 @@
 def notes_needed(amount):
-    return int(amount.replace(',', '')) // 100
+    if amount is None or not isinstance(amount, str):
+        return 0
+    clean = amount.replace(',', '').strip()
+    try:
+        val = int(clean)
+        if val < 0:
+            return 0
+        return val // 100
+    except (ValueError, TypeError):
+        return 0
 
 def mask_card(card_number):
-    groups = card_number.split()
-    return "XXXX XXXX XXXX " + groups[3]
+    if card_number is None or not isinstance(card_number, str):
+        return "XXXX XXXX XXXX XXXX"
+    groups = card_number.strip().split()
+    if len(groups) >= 4:
+        return "XXXX XXXX XXXX " + groups[3]
+    elif len(groups) == 1 and len(groups[0]) >= 4:
+        return "XXXX XXXX XXXX " + groups[0][-4:]
+    return "XXXX XXXX XXXX XXXX"
 
 def average_withdrawal(amounts_csv):
-    amounts = [int(a) for a in amounts_csv.split(',')]
+    if amounts_csv is None or not isinstance(amounts_csv, str):
+        return 0
+    amounts = []
+    for a in amounts_csv.split(','):
+        a_clean = a.replace(',', '').strip()
+        try:
+            amounts.append(int(a_clean))
+        except (ValueError, TypeError):
+            continue
+    if not amounts:
+        return 0
     return sum(amounts) // len(amounts)
 
 def main():
